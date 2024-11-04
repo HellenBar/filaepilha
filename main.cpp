@@ -1,35 +1,36 @@
 #include <stdio.h>
-#define TAMANHO 5
+#include <stdlib.h>
+
+typedef struct No {
+    int valor;
+    struct No *proximo;
+} No;
 
 typedef struct {
-    int itens[TAMANHO];
-    int topo;
+    No *topo;
 } Pilha;
 
 // Inicializa a pilha
 void inicializarPilha(Pilha *pilha) {
-    pilha->topo = -1;
+    pilha->topo = NULL;
 }
 
 // Verifica se a pilha está vazia
 int estaVazia(Pilha *pilha) {
-    return (pilha->topo == -1);
-}
-
-// Verifica se a pilha está cheia
-int estaCheia(Pilha *pilha) {
-    return (pilha->topo == TAMANHO - 1);
+    return (pilha->topo == NULL);
 }
 
 // Empilhar (push)
 void empilhar(Pilha *pilha, int valor) {
-    if (estaCheia(pilha)) {
-        printf("Pilha cheia!\n");
-    } else {
-        pilha->topo++;
-        pilha->itens[pilha->topo] = valor;
-        printf("Empilhado: %d\n", valor);
+    No *novoNo = (No *)malloc(sizeof(No));
+    if (!novoNo) {
+        printf("Erro de memória!\n");
+        return;
     }
+    novoNo->valor = valor;
+    novoNo->proximo = pilha->topo;
+    pilha->topo = novoNo;
+    printf("Empilhado: %d\n", valor);
 }
 
 // Desempilhar (pop)
@@ -38,8 +39,10 @@ int desempilhar(Pilha *pilha) {
         printf("Pilha vazia!\n");
         return -1;
     } else {
-        int valor = pilha->itens[pilha->topo];
-        pilha->topo--;
+        No *temp = pilha->topo;
+        int valor = temp->valor;
+        pilha->topo = temp->proximo;
+        free(temp);
         return valor;
     }
 }
@@ -50,7 +53,7 @@ int consultarTopo(Pilha *pilha) {
         printf("Pilha vazia!\n");
         return -1;
     } else {
-        return pilha->itens[pilha->topo];
+        return pilha->topo->valor;
     }
 }
 
@@ -65,6 +68,5 @@ int main() {
     printf("Topo da pilha: %d\n", consultarTopo(&pilha));
     desempilhar(&pilha);
     printf("Topo apos desempilhar: %d\n", consultarTopo(&pilha));
-
     return 0;
 }
